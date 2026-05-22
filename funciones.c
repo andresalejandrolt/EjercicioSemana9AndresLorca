@@ -116,8 +116,6 @@ void registrarLibro(int *sigID, Libro *libros, int *numeroLibros) {
         return;
     }
 
-    strcpy((libros + *numeroLibros)->titulo, tituloAux);
-
     printf("Ingrese el Autor del libro: ");
     fgets(autorAux, MAX_CARACTERES_AUTOR, stdin);
     eliminarSaltoLinea(autorAux);
@@ -144,10 +142,8 @@ void registrarLibro(int *sigID, Libro *libros, int *numeroLibros) {
     actualizarEstadoLibro(&libroAux);
     libroAux.ID = *sigID;
 
-    *sigID += 1;
-    *numeroLibros += 1;
-
     *(libros + *numeroLibros) = libroAux;
 
-
+    (*sigID)++;
+    (*numeroLibros)++;
 }
