@@ -85,7 +85,6 @@ int buscarLibro(char *nombreTemp, Libro *libros, int numeroLibros) {
     return -1;
 }
 
-
 void registrarLibro(int *sigID, Libro *libros, int *numeroLibros) {
 
     if (*numeroLibros >= MAX_LIBROS) {
@@ -94,6 +93,9 @@ void registrarLibro(int *sigID, Libro *libros, int *numeroLibros) {
     }
 
     char tituloAux [MAX_CARACTERES_TITULO];
+    char autorAux [MAX_CARACTERES_AUTOR];
+    int fechaPublicacionAux;
+
 
     printf("\n========== REGISTRO DE LIBRO ==========\n");
     printf("Registando libro con ID[%d]\n", *sigID);
@@ -107,7 +109,6 @@ void registrarLibro(int *sigID, Libro *libros, int *numeroLibros) {
     }
     nombreAMayusculas(tituloAux);
 
-
     int indexRepetido = buscarLibro(tituloAux, libros, *numeroLibros);
 
     if (indexRepetido != -1) {
@@ -116,9 +117,37 @@ void registrarLibro(int *sigID, Libro *libros, int *numeroLibros) {
     }
 
     strcpy((libros + *numeroLibros)->titulo, tituloAux);
-    printf("Ingrese el autor del Libro");
+
+    printf("Ingrese el Autor del libro: ");
+    fgets(autorAux, MAX_CARACTERES_AUTOR, stdin);
+    eliminarSaltoLinea(autorAux);
+    nombreAMayusculas(autorAux);
 
 
+        printf("Ingrese la fecha de publicacion libro: ");
+
+        fechaPublicacionAux = (int) validarIngreso(0);
+
+        while (fechaPublicacionAux > ANIO_ACTUAL) {
+
+            printf("Error, ingrese un anio menor o igual al actual! : ");
+            fechaPublicacionAux = (int) validarIngreso(0);
+
+        }
+
+    Libro libroAux;
+
+    strcpy(libroAux.titulo, tituloAux);
+    strcpy(libroAux.autor, autorAux);
+    libroAux.fechaPublicacion = fechaPublicacionAux;
+    libroAux.disponible = 1;
+    actualizarEstadoLibro(&libroAux);
+    libroAux.ID = *sigID;
+
+    *sigID += 1;
+    *numeroLibros += 1;
+
+    *(libros + *numeroLibros) = libroAux;
 
 
 }

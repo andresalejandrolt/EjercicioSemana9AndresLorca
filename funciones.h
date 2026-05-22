@@ -9,6 +9,8 @@
 #define MAX_CARACTERES_AUTOR 50
 #define MAX_CARACTERES 20
 #define MAX_LIBROS 10
+#define ANIO_ACTUAL 2026
+#define ID_INICIAL 1000
 
 typedef struct {
 
@@ -27,7 +29,13 @@ typedef struct {
 
 void presioneContinuar();
 void limpiarBuffer();
-void agregarLibro();
+void imprimirDatosLibro(Libro *libro);
+void eliminarSaltoLinea(char *titulo);
+float validarIngreso(int validarPositivos);
+void nombreAMayusculas(char *nombre);
+void actualizarEstadoLibro(Libro *libro);
+int buscarLibro(char *nombreTemp, Libro *libros, int numeroLibros);
+void registrarLibro(int *sigID, Libro *libros, int *numeroLibros);
 
 
 
