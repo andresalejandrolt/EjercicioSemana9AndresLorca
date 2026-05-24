@@ -36,6 +36,7 @@ void nombreAMayusculas(char *nombre);
 void actualizarEstadoLibro(Libro *libro);
 int buscarLibro(char *nombreTemp, Libro *libros, int numeroLibros);
 void registrarLibro(int *sigID, Libro *libros, int *numeroLibros);
+void ejecutarPrograma();
 
 
 
