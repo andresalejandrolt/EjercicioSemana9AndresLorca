@@ -1,7 +1,3 @@
-//
-// Created by Andrés on 21/5/2026.
-//
-
 #include "funciones.h"
 
 void limpiarBuffer() {
@@ -9,10 +5,20 @@ void limpiarBuffer() {
     }
 }
 
-void imprimirDatosLibro(Libro *libro) {
+void imprimirDatosLibros(Libro *libros, int numeroLibros) {
 
-    printf("%8d | %30s | %15s | %16d | %10s\n", libro->ID, libro->titulo,
-           libro->autor, libro->fechaPublicacion, libro->estado);
+    if (numeroLibros == 0) {
+        printf("\nError, aun no hay libros registrados!\n");
+        return;
+    }
+
+    printf("\n%-8s | %-30s | %-15s | %-16s | %-10s\n", "ID LIBRO", "TITULO LIBRO",
+           "AUTOR LIBRO", "ANIO PUBLICACION", "ESTADO");
+
+    for (int i = 0; i < numeroLibros; i++) {
+        printf("%8d | %30s | %15s | %16d | %10s\n", (libros + i)->ID, (libros + i)->titulo,
+               (libros + i)->autor, (libros + i)->fechaPublicacion, (libros + i)->estado);
+    }
 }
 
 void eliminarSaltoLinea(char *titulo) {
@@ -21,7 +27,6 @@ void eliminarSaltoLinea(char *titulo) {
 
 void presioneContinuar() {
     printf("\nPresione ENTER para continuar\n");
-    // limpiarBuffer();
     getchar();
 }
 
@@ -74,16 +79,144 @@ int buscarLibro(char *nombreTemp, Libro *libros, int numeroLibros) {
     return -1;
 }
 
+int buscarLibroPorID(int id, Libro *libros, int numeroLibros) {
+    for (int i = 0; i < numeroLibros; i++) {
+        if ((libros + i)->ID == id) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void imprimirUnLibro(Libro *libro) {
+    printf("\n%-8s | %-30s | %-15s | %-16s | %-10s\n", "ID LIBRO", "TITULO LIBRO",
+           "AUTOR LIBRO", "ANIO PUBLICACION", "ESTADO");
+    printf("%8d | %30s | %15s | %16d | %10s\n", libro->ID, libro->titulo,
+           libro->autor, libro->fechaPublicacion, libro->estado);
+}
+
+void buscarYMostrarLibro(Libro *libros, int *numeroLibros) {
+
+    if (*numeroLibros == 0) {
+        printf("\nError, aun no hay libros registrados!\n");
+        return;
+    }
+
+    printf("\n========== BUSCAR LIBRO ==========\n");
+    printf("1. Buscar por titulo\n");
+    printf("2. Buscar por ID\n");
+    printf("Ingrese una opcion: ");
+
+    int opcion = (int) validarIngreso(0);
+
+    if (opcion == 1) {
+        char tituloAux[MAX_CARACTERES_TITULO];
+        printf("Ingrese el titulo del libro: ");
+        fgets(tituloAux, MAX_CARACTERES_TITULO, stdin);
+        eliminarSaltoLinea(tituloAux);
+        nombreAMayusculas(tituloAux);
+
+        int index = buscarLibro(tituloAux, libros, *numeroLibros);
+
+        if (index == -1) {
+            printf("\nLibro no encontrado!\n");
+        } else {
+            imprimirUnLibro(libros + index);
+        }
+
+    } else if (opcion == 2) {
+        printf("Ingrese el ID del libro: ");
+        int id = (int) validarIngreso(0);
+
+        int index = buscarLibroPorID(id, libros, *numeroLibros);
+
+        if (index == -1) {
+            printf("\nLibro no encontrado!\n");
+        } else {
+            imprimirUnLibro(libros + index);
+        }
+
+    } else {
+        printf("\nOpcion invalida!\n");
+    }
+}
+
+void cambiarEstadoLibro(Libro *libros, int *numeroLibros) {
+
+    if (*numeroLibros == 0) {
+        printf("\nError, aun no hay libros registrados!\n");
+        return;
+    }
+
+    printf("\n========== ACTUALIZAR ESTADO ==========\n");
+    printf("Ingrese el ID del libro a actualizar: ");
+    int id = (int) validarIngreso(0);
+
+    int index = buscarLibroPorID(id, libros, *numeroLibros);
+
+    if (index == -1) {
+        printf("\nLibro no encontrado!\n");
+        return;
+    }
+
+    Libro *libro = libros + index;
+
+    printf("\nLibro encontrado: %s\n", libro->titulo);
+    printf("Estado actual: %s\n", libro->estado);
+
+    libro->disponible = !libro->disponible;
+    actualizarEstadoLibro(libro);
+
+    printf("Nuevo estado: %s\n", libro->estado);
+    printf("\nEstado actualizado correctamente!\n");
+}
+
+void eliminarLibro(Libro *libros, int *numeroLibros) {
+
+    if (*numeroLibros == 0) {
+        printf("\nError, aun no hay libros registrados!\n");
+        return;
+    }
+
+    printf("\n========== ELIMINAR LIBRO ==========\n");
+    printf("Ingrese el ID del libro a eliminar: ");
+    int id = (int) validarIngreso(0);
+
+    int index = buscarLibroPorID(id, libros, *numeroLibros);
+
+    if (index == -1) {
+        printf("\nLibro no encontrado!\n");
+        return;
+    }
+
+    printf("\nLibro a eliminar: %s (ID: %d)\n", (libros + index)->titulo, (libros + index)->ID);
+    printf("Confirma la eliminacion? (1 = Si, 0 = No): ");
+    int confirmacion = (int) validarIngreso(0);
+
+    if (confirmacion != 1) {
+        printf("\nEliminacion cancelada.\n");
+        return;
+    }
+
+    for (int i = index; i < *numeroLibros - 1; i++) {
+        *(libros + i) = *(libros + i + 1);
+    }
+
+    (*numeroLibros)--;
+
+    printf("\nLibro eliminado correctamente!\n");
+}
+
 void registrarLibro(int *sigID, Libro *libros, int *numeroLibros) {
+
     if (*numeroLibros >= MAX_LIBROS) {
-        printf("\nError, limite de productos alcanzados!\n");
+        printf("\nError, limite de libros alcanzados!\n");
         return;
     }
 
     char tituloAux[MAX_CARACTERES_TITULO];
     char autorAux[MAX_CARACTERES_AUTOR];
     int fechaPublicacionAux;
-
 
     printf("\n========== REGISTRO DE LIBRO ==========\n");
     printf("\nRegistando libro con ID[%d]\n", *sigID);
@@ -107,6 +240,12 @@ void registrarLibro(int *sigID, Libro *libros, int *numeroLibros) {
     printf("Ingrese el Autor del libro: ");
     fgets(autorAux, MAX_CARACTERES_AUTOR, stdin);
     eliminarSaltoLinea(autorAux);
+
+    if (strlen(autorAux) == 0) {
+        printf("Autor invalido\n");
+        return;
+    }
+
     nombreAMayusculas(autorAux);
 
     printf("Ingrese la fecha de publicacion libro: ");
@@ -135,15 +274,12 @@ void registrarLibro(int *sigID, Libro *libros, int *numeroLibros) {
     printf("\nLibro Registrado Correctamente!\n");
 }
 
-
-
 void ejecutarPrograma() {
 
     Libro libros[MAX_LIBROS];
     int numeroLibros = 0;
     int sigID = ID_INICIAL;
     int flag = 1;
-
     int opUsuario = 0;
 
     do {
@@ -160,50 +296,49 @@ void ejecutarPrograma() {
 
         switch (opUsuario) {
 
-            case 0 : {
+            case 0: {
                 flag = 0;
                 printf("\nSaliendo del programa...\n");
                 presioneContinuar();
                 break;
             }
 
-            case 1 : {
+            case 1: {
                 registrarLibro(&sigID, libros, &numeroLibros);
                 presioneContinuar();
                 break;
             }
 
-            case 2 : {
-
-                printf("\n%-8s | %-30s | %-15s | %-16s | %-10s\n", "ID LIBRO", "TITULO LIBRO",
-                "AUTOR LIBRO", "ANIO PUBLICACION", "ESTADO");
-
-                for (int i = 0; i < numeroLibros; i++) {
-
-                    imprimirDatosLibro(&libros[i]);
-
-                }
-
-            }
-            case 3 : {
-
-            }
-            case 4 : {
-
-            }
-            case 5 : {
-
+            case 2: {
+                imprimirDatosLibros(libros, numeroLibros);
+                presioneContinuar();
+                break;
             }
 
+            case 3: {
+                buscarYMostrarLibro(libros, &numeroLibros);
+                presioneContinuar();
+                break;
+            }
 
+            case 4: {
+                cambiarEstadoLibro(libros, &numeroLibros);
+                presioneContinuar();
+                break;
+            }
 
+            case 5: {
+                eliminarLibro(libros, &numeroLibros);
+                presioneContinuar();
+                break;
+            }
+
+            default: {
+                printf("\nOpcion invalida!\n");
+                presioneContinuar();
+                break;
+            }
         }
 
-
-
-
-
-    }while (flag);
-
+    } while (flag);
 }
-
